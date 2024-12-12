@@ -1,0 +1,86 @@
+{% extends 'blog/base.html' %} 
+ 
+{% block content %} 
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4 shadow-sm">
+            {% if blog_detail.image %}
+                <img src="{{ blog_detail.image.url }}" class="card-img-top" alt="{{ blog_detail.title }}">
+            {% endif %}
+            <div class="card-header">
+                <h1 class="mb-0">{{ blog_detail.title }}</h1>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ blog_detail.content }}</p>
+                
+                <hr class="border-secondary">
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Posted by {{ blog_detail.author.username }} on {{ blog_detail.created_at|date:"F d, Y" }}
+                    </small>
+                    
+                    <div class="like-section">
+                        <form method="POST" action="{{ blog_detail.id }}/toggle_like/" class="d-inline"> 
+                            {% csrf_token %} 
+                            {% if request.user.is_authenticated %} 
+                                {% if blog_detail.is_liked %} 
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        Unlike <span class="badge bg-light text-dark">{{ blog_detail.likes_count }}</span>
+                                    </button>
+                                {% else %} 
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Like <span class="badge bg-light text-dark">{{ blog_detail.likes_count }}</span>
+                                    </button>
+                                {% endif %} 
+                            {% else %} 
+                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                                    Login to Like <span class="badge bg-light text-dark">{{ blog_detail.likes_count }}</span>
+                                </button>
+                            {% endif %} 
+                        </form>
+                    </div>
+                </div>
+                
+                {% if request.user == blog_detail.author %}
+                    <div class="mt-3">
+                        <a href="/posts/{{ blog_detail.id }}/update/" class="btn btn-sm btn-outline-secondary">Update Post</a>
+                        <a href="/posts/{{ blog_detail.id }}/delete/" class="btn btn-sm btn-outline-danger">Delete Post</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if request.user.is_authenticated %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ comment_form.content }}
+                    <button type="submit" class="btn btn-primary mt-2">Add Comment</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if comments %}
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">Comments ({{ comments.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% for comment in comments %}
+                    <div class="mb-3 pb-3 border-bottom border-secondary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>{{ comment.author.username }}</strong>
+                            <small class="text-muted">{{ comment.created_at|date:"F d, Y H:i" }}</small>
+                        </div>
+                        <p class="mt-2">{{ comment.content }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
