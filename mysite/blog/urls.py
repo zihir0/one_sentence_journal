@@ -10,7 +10,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('<id>/update/', blog_update),
     path ('', blog_list, name='blog_list'),
-    path('<id>/', blog_detail),
+    path('<id>/', blog_detail, name='blog_detail'),
     path('<id>/delete/', blog_delete),
     path('<int:post_id>/toggle_like/', toggle_like, name='toggle_like'),
 ] 
